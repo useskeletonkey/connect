@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "skeleton-key": {
+      "type": "http",
+      "url": "https://useskeletonkey.com/api/mcp"
+    }
+  }
+}
