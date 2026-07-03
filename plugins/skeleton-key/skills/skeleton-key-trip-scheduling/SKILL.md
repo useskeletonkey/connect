@@ -250,6 +250,17 @@ priority; "skip / only if time" → deprioritize; logistics notes ("needs 4," "d
 comment wins — it's the newer, more specific human signal. Whenever a comment changes the plan,
 say so.
 
+### Cut games are out of the pool
+
+A **cut** game (`isCut: true`) is one the owner deliberately set aside — the structured
+equivalent of an "already played" comment. **Never schedule a cut game.** `list_games` hides cut
+games by default, so the pool you place from is already clean; `get_trip_summary` still lists
+them (labeled `isCut`) so you can see the whole pool. Once per session, do one
+`list_games` with `includeCut: true` to see what was cut and read those games' comments (the
+*why* often lives there) — and if something high-priority was cut, surface it rather than
+silently honoring it ("you've cut [room], a top-priority pick — intended, or should it go back
+in?"). Don't un-cut a game yourself; flag it and let the user decide.
+
 ### Arrival, departure, and city changes
 
 - **Arrival day:** gate on arrival time + delay risk, not on it being "the arrival day." Risk
@@ -294,6 +305,8 @@ loss for a low-priority room only if the user said so.
   `transitMode` (`flight`/`train`/`ferry`/`bus`/`other`) for inter-city legs.
 - `set_endpoint` — arrival/departure; keep a high-risk arrival day empty.
 - `book_game` — commit in priority × scarcity order.
+- `list_games` — the schedulable pool; hides cut games by default (pass `includeCut` to audit
+  what was set aside — see Cut games).
 - `list_game_slots` — the only legitimate source of pinnable times.
 - `list_game_comments` — honor member intent (see Comments).
 - `evaluate_schedule` / `warm_travel` — the required verification pair (see Verify).
