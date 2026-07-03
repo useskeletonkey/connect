@@ -16,7 +16,7 @@ This plugin bundles two things:
 In Claude Code, run:
 
 ```
-/plugin marketplace add useskeletonkey/connect
+/plugin marketplace add useskeletonkey/skeleton-key-plugin
 /plugin install skeleton-key@skeleton-key
 ```
 
