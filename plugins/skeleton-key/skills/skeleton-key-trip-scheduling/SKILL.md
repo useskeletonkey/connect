@@ -55,7 +55,9 @@ to memory.
 3. **Region geography**: which venues cluster into which areas; travel times between them.
 4. **Venue operating hours** — they set the earliest feasible start each day; a constraint, not
    a preference.
-5. **Per-room priority and popularity** — needed for placement and booking order.
+5. **Per-room priority and popularity** — needed for placement and booking order. Priority is
+   the user's call; `bookingPressure` on `list_games` is the data-driven popularity/scarcity read
+   that feeds booking order (see Booking order).
 6. **Game comments** — read them for every game with `commentCount > 0` (see Comments rule).
 
 ## Step 2 — The trip profile
@@ -133,7 +135,7 @@ stays local; **durable** ("we never do late nights") updates the profile.
 | Slot grid squeezes a meal below the user's floor | "Real slots leave only 45 min for dinner — eat fast, or drop/move a room?" |
 | A dense slate squeezes out tourism entirely | "No sightseeing fits this trip; trading [specific room] buys a half-day — worth it?" |
 | A room's player minimum exceeds the group | "Needs 4 — recruit, pay for empty slots, or drop?" |
-| First booking discussion | The booking-risk question: lock everything early, or book the scarce ones and gamble on the rest? |
+| First booking discussion | The booking-risk question: lock everything early, or book the `high`/`medium`-pressure ones and gamble on the `low`-pressure rest? |
 | Arrival day with meaningful delay risk | "Booking anything that evening risks the fee if you're delayed — book or keep it free?" |
 | A light day, especially all-projected rooms | "This day is light and nothing on it is bookable yet — make it the tourism half-day and cluster its rooms to one end?" |
 
@@ -289,11 +291,16 @@ in?"). Don't un-cut a game yourself; flag it and let the user decide.
 
 ### Booking order — when to commit, not the final grid
 
-Sequence bookings by **priority × scarcity**, not by date. Book high-priority + popular rooms
-early — even before an anchor event's schedule publishes; let the trip build around those
-anchors. Gamble on low-priority, low-demand rooms per the user's booking-risk answer: leave them
-unbooked and squeeze them into gaps once the fixed schedule lands; a sellout is an acceptable
-loss for a low-priority room only if the user said so.
+Sequence bookings by **priority × scarcity**, not by date. Read the scarcity axis from
+`bookingPressure.tier` on `list_games` — a data-driven read of how hard each room is to book:
+`high` (books solid weeks out, or barely runs) > `medium` (tightens only near-in) > `low`/none.
+(The app shows these to users as "hottest" / "hot" / no-tag, but the API returns `high`/`medium`/
+`low`.) Book high-priority + `high`-pressure rooms first — even before an anchor event's schedule
+publishes; let the trip build around those anchors. Gamble on low-priority, `low`-pressure rooms
+per the user's booking-risk answer: leave them unbooked and squeeze them into gaps once the fixed
+schedule lands; a sellout is an acceptable loss for a low-priority room only if the user said so.
+`bookingPressure` is an estimate (carries a `confidence`; `null` for irregular or off-platform
+rooms) — a guide for ordering, never an override of a stated priority or of real availability.
 
 ## Operating the Skeleton Key tools
 
